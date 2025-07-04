@@ -1,0 +1,28 @@
+# --- Policy: Enforce S3 Bucket Encryption ---
+# This policy ensures that all S3 buckets created have server-side encryption enabled.
+
+policy "s3_bucket_encryption_enabled" {
+  source = "s3-encryption.sentinel" # Assuming a reusable module or direct policy
+  param "bucket_name_prefix" {
+    value = "efs-backup-verifier" # Matches the project_name variable in Terraform
+    type  = string
+  }
+}
+
+# s3-encryption.sentinel (Example content for the policy source)
+# import "tfplan/v2" as tfplan
+#
+# param bucket_name_prefix
+#
+# all_s3_buckets = tfplan.find_resources("aws_s3_bucket")
+#
+# rule s3_encryption {
+#   all true for all_s3_buckets as _, bucket {
+#     bucket.name starts_with bucket_name_prefix and
+#     length(tfplan.find_resources("aws_s3_bucket_server_side_encryption_configuration",
+#       { "bucket": bucket.address }
+#     )) > 0
+#   }
+# }
+#
+# main = rule s3_encryption

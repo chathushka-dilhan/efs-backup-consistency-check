@@ -1,0 +1,38 @@
+# --- Policy: Enforce ECS Fargate Task Resource Limits ---
+# This policy ensures that ECS Fargate tasks have defined CPU and memory limits.
+
+policy "ecs_fargate_resource_limits" {
+  source = "ecs-fargate-limits.sentinel"
+  param "task_definition_family_prefix" {
+    value = "efs-backup-verifier"
+    type  = string
+  }
+  param "min_cpu" {
+    value = 256 # Minimum CPU units (e.g., 0.25 vCPU)
+    type  = int
+  }
+  param "min_memory" {
+    value = 512 # Minimum memory (e.g., 0.5 GB)
+    type  = int
+  }
+}
+
+# ecs-fargate-limits.sentinel (Example content for the policy source)
+# import "tfplan/v2" as tfplan
+#
+# param task_definition_family_prefix
+# param min_cpu
+# param min_memory
+#
+# all_ecs_task_definitions = tfplan.find_resources("aws_ecs_task_definition")
+#
+# rule ecs_fargate_limits_defined {
+#   all true for all_ecs_task_definitions as _, task_def {
+#     task_def.family starts_with task_definition_family_prefix and
+#     task_def.requires_compatibilities contains "FARGATE" and
+#     task_def.cpu >= min_cpu and
+#     task_def.memory >= min_memory
+#   }
+# }
+#
+# main = rule ecs_fargate_limits_defined

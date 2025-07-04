@@ -1,0 +1,31 @@
+# --- Policy: Enforce IAM Role Least Privilege (No '*-*' Actions) ---
+# This policy checks that IAM role policies do not use broad "*-*" actions,
+# promoting the principle of least privilege.
+
+policy "iam_role_least_privilege" {
+  source = "iam-least-privilege.sentinel" # Assuming a reusable module or direct policy
+  param "role_names_prefix" {
+    value = "efs-backup-verifier"
+    type  = string
+  }
+}
+
+# iam-least-privilege.sentinel (Example content for the policy source)
+# import "tfplan/v2" as tfplan
+#
+# param role_names_prefix
+#
+# all_iam_role_policies = tfplan.find_resources("aws_iam_role_policy")
+#
+# rule no_wildcard_actions {
+#   all true for all_iam_role_policies as _, policy {
+#     policy.role.name starts_with role_names_prefix and
+#     all true for policy.policy.Statement as _, statement {
+#       all true for statement.Action as _, action {
+#         not (action matches ".*:.*") or (action contains ":") # Allow specific actions, disallow "service:*"
+#       }
+#     }
+#   }
+# }
+#
+# main = rule no_wildcard_actions

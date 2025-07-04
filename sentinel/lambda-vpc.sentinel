@@ -1,0 +1,29 @@
+# --- Policy: Enforce Lambda Functions in a VPC ---
+# This policy ensures that critical Lambda functions are deployed within a VPC
+# for network isolation and controlled access.
+
+policy "lambda_in_vpc" {
+  source = "lambda-vpc.sentinel" # Assuming a reusable module or direct policy
+  param "lambda_function_name_prefix" {
+    value = "efs-backup-verifier"
+    type  = string
+  }
+}
+
+# lambda-vpc.sentinel (Example content for the policy source)
+# import "tfplan/v2" as tfplan
+#
+# param lambda_function_name_prefix
+#
+# all_lambda_functions = tfplan.find_resources("aws_lambda_function")
+#
+# rule lambda_vpc_configured {
+#   all true for all_lambda_functions as _, lambda_func {
+#     lambda_func.function_name starts_with lambda_function_name_prefix and
+#     lambda_func.vpc_config is not undefined and
+#     length(lambda_func.vpc_config.subnet_ids) > 0 and
+#     length(lambda_func.vpc_config.security_group_ids) > 0
+#   }
+# }
+#
+# main = rule lambda_vpc_configured
